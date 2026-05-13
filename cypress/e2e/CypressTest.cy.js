@@ -23,7 +23,18 @@ describe('Cypress Tests', () => {
       cy.get('.vacancy-add-form-wrapper > .form > :nth-child(1) > .form__labels > .labels > :nth-child(5) > .form-control--responsive > .form-input--date').type('2026-07-01', { force: true });
       cy.get('.vacancy-add-form-wrapper > .form > :nth-child(1) > .form__labels > .labels > :nth-child(6) > [name="requirements"] > .form-area').type('Знание Cypress', { force: true });
       cy.get('.vacancy-add-form-wrapper > .form > :nth-child(1) > .form__labels > .labels > :nth-child(7) > [name="responsibilities"] > .form-area').type('Писать тесты', { force: true });
-      cy.get('.vacancy-add-form-wrapper > .form > .form__buttons > .buttons').click({ force: true });
+      cy.get('.vacancy-add-form-wrapper > .form > .form__buttons > .buttons > .button').click({ force: true });
+    });
+  });
+
+  it('3. Просмотр страницы со стажировками (поиск и фильтр)', () => {
+    cy.fixture('cypressTest').then((data) => {
+      cy.visit(data.main_url + '/internships');
+      cy.get('.form-input--text').first().type('Тестовая стажировка', { delay: 0 });
+      cy.get('div.search-input__field > .button').click();
+      cy.get(':nth-child(2) > .radio-component__label').click();
+      cy.get('.form-select__selected').first().click();
+      cy.get('.form-select__items > :nth-child(1)').click();
     });
   });
 });
