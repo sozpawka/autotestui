@@ -37,4 +37,16 @@ describe('Cypress Tests', () => {
       cy.get('.form-select__items > :nth-child(1)').click();
     });
   });
+  
+  it('5. Подтверждение отклика работодателем', () => {
+    cy.fixture('cypressTest').then((data) => {
+      cy.visit(data.main_url + '/login');
+      cy.get('.form-input--text').type(data.login, { delay: 0 });
+      cy.get('.form-input--password').type(data.password, { delay: 0 });
+      cy.get(':nth-child(3) > .button').click();
+      cy.get(':nth-child(5) > .menu-item__item-name').click();
+      cy.get('.responses-page__tabs > .navigation-workspace > :nth-child(2) > .navigation-item__title').click();
+      cy.get(':nth-child(1) > .responses-list-item__actions > :nth-child(1)').click();
+    });
+  });
 });
