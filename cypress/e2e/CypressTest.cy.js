@@ -82,4 +82,55 @@ describe('Cypress Tests', () => {
       cy.get('.status-open__buttons > :nth-child(1)').click({ force: true });
     });
   });
+
+  it('8. Негативный тест: Авторизация с пустым паролем', () => {
+    cy.fixture('cypressTest').then((data) => {
+      cy.visit(data.main_url + '/login');
+      cy.get('.form-input--text').type(data.login);
+      cy.get(':nth-child(3) > .button').click({ force: true });
+      cy.url().should('include', '/login'); 
+    });
+  });
+
+  it('9. Негативный тест: Поиск несуществующей стажировки', () => {
+    cy.fixture('cypressTest').then((data) => {
+      cy.visit(data.main_url + '/internships');
+      cy.get('.form-input--text').first().type('ASDFG12345', { delay: 0 });
+      cy.get('div.search-input__field > .button').click();
+      cy.get('body').should('not.contain', 'Тестовая стажировка');
+    });
+  });
+
+  it('10. Негативный тест: Создание стажировки с пустым названием', () => {
+    cy.fixture('cypressTest').then((data) => {
+      cy.visit(data.main_url + '/login');
+      cy.get('.form-input--text').type(data.login);
+      cy.get('.form-input--password').type(data.password);
+      cy.get(':nth-child(3) > .button').click();
+      cy.get('.menu-item__item-name').contains('Стажировки').click();
+      cy.get('[data-v-e4f6348f=""][data-v-4849dea2=""] > .vacancies-block > .vacancies-block__filters-wrapper > .button').first().click();
+      cy.get('.vacancy-add-form-wrapper > .form > .form__buttons > .buttons > .button').click({ force: true });
+      cy.get('.desktop-modal__content').should('be.visible');
+    });
+  });
+
+  it('11. Негативный тест: Попытка зайти в личный кабинет без авторизации', () => {
+    cy.fixture('cypressTest').then((data) => {
+      cy.visit(data.main_url + '/account/internships');
+      cy.url().should('not.include', '/account/internships');
+    });
+  });
+
+  it('12. Негативный тест: Отправка пустого комментария в рабочем пространстве', () => {
+    cy.fixture('cypressTest').then((data) => {
+      cy.visit(data.main_url + '/login');
+      cy.get('.form-input--text').type(data.login);
+      cy.get('.form-input--password').type(data.password);
+      cy.get(':nth-child(3) > .button').click();
+      cy.get(':nth-child(5) > .menu-item__item-name').click();
+      cy.get(':nth-child(3) > .navigation-item__title').click();
+      cy.get('.infinite-loader > :nth-child(1) > .button').click();
+      cy.get('.comment-textarea__buttons > :nth-child(2)').should('be.disabled');
+    });
+  });
 });
