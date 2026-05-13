@@ -46,7 +46,9 @@ describe('Cypress Tests', () => {
       cy.get(':nth-child(3) > .button').click();
       cy.get(':nth-child(5) > .menu-item__item-name').click();
       cy.get('.responses-page__tabs > .navigation-workspace > :nth-child(2) > .navigation-item__title').click();
-      cy.get(':nth-child(1) > .responses-list-item__actions > :nth-child(1)').click();
+      cy.get(':nth-child(2) > :nth-child(2) > .form-select__selected').click();
+      cy.get('.form-select__items > :nth-child(4)').click();
+      cy.get(':nth-child(1) > .responses-list-item__actions > :nth-child(1)').click({ force: true });
     });
   });
 
@@ -58,9 +60,26 @@ describe('Cypress Tests', () => {
       cy.get(':nth-child(3) > .button').click();
       cy.get(':nth-child(5) > .menu-item__item-name').click();
       cy.get(':nth-child(3) > .navigation-item__title').click();
+      cy.get(':nth-child(2) > :nth-child(2) > .form-select__selected').click();
+      cy.get('.form-select__items > :nth-child(4)').click();
       cy.get('.infinite-loader > :nth-child(1) > .button').click();
       cy.get('.form-area').type('Тестовый текст', { force: true });
       cy.get('.comment-textarea__buttons > :nth-child(2)').click();
+    });
+  });
+
+  it('7. Смена статуса рабочего пространства', () => {
+    cy.fixture('cypressTest').then((data) => {
+      cy.visit(data.main_url + '/login');
+      cy.get('.form-input--text').type(data.login, { delay: 0 });
+      cy.get('.form-input--password').type(data.password, { delay: 0 });
+      cy.get(':nth-child(3) > .button').click();
+      cy.get(':nth-child(5) > .menu-item__item-name').click();
+      cy.get(':nth-child(3) > .navigation-item__title').click();
+      cy.get(':nth-child(2) > :nth-child(2) > .form-select__selected').click();
+      cy.get('.form-select__items > :nth-child(4)').click();
+      cy.get('.infinite-loader > :nth-child(1) > .button').click();
+      cy.get('.status-open__buttons > :nth-child(1)').click({ force: true });
     });
   });
 });
