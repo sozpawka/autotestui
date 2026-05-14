@@ -60,7 +60,7 @@ describe('Cypress Tests', () => {
       cy.visit(data.main_url + '/login');
       cy.get('.form-input--text').type(data.login, { delay: 0 });
       cy.get('.form-input--password').type(data.password, { delay: 0 });
-      cy.get(':nth-child(3) > .button').click();
+      cy.get(':nth-child(3) > .button').click();  
       cy.get(':nth-child(5) > .menu-item__item-name').click();
       cy.get('.responses-page__tabs > .navigation-workspace > :nth-child(2) > .navigation-item__title').click();
       cy.get(':nth-child(2) > :nth-child(2) > .form-select__selected').click();
@@ -189,5 +189,13 @@ describe('Cypress Negative Tests', () => {
       cy.get('.base-comment').should('not.have.text', '');
     });
   });
-
+  
+  it('13. Негативный тест: Попытка доступа к рабочему пространству без авторизации', () => {
+    cy.fixture('cypressTest').then((data) => {
+      cy.visit(data.main_url + '/workspaces/443');
+      cy.url().should('include', '/login');
+      cy.get('.form-input--text').should('be.visible');
+      cy.get('.workspace-page').should('not.exist');
+    });
+  });
 });
