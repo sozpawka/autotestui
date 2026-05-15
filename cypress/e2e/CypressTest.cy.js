@@ -1,12 +1,13 @@
 describe('Cypress Tests', () => {
   it('1. Проверка подключения к серверу', () => {
     cy.fixture('cypressTest').then((data) => {
+      cy.request(data.main_url).its('status').should('eq', 200);
       cy.visit(data.main_url);
       cy.get('body').should('be.visible');
     });
   });
 
-  it('2. Создание новой стажировки работодателем', () => {
+it('2. Создание новой стажировки работодателем', () => {
     cy.fixture('cypressTest').then((data) => {
       cy.visit(data.main_url);
       cy.get('[href="/login"] > .button').click();
@@ -16,16 +17,16 @@ describe('Cypress Tests', () => {
       cy.url().should('include', '/account');
       cy.get('.menu-item__item-name').contains('Стажировки').click();
       cy.get('[data-v-e4f6348f=""][data-v-4849dea2=""] > .vacancies-block > .vacancies-block__filters-wrapper > .button').first().click();
-
       cy.get('.desktop-modal__content').should('be.visible');
-      cy.get('.vacancy-add-form-wrapper > .form > :nth-child(1) > .form__labels > .labels > :nth-child(1) > .form-control--responsive > .form-input--').type('Тестовая стажировка', { force: true });
+      cy.get('.vacancy-add-form-wrapper > .form > :nth-child(1) > .form__labels > .labels > :nth-child(1) > .form-control--responsive > .form-input--').type('Проверка12', { force: true });
       cy.get('.vacancy-add-form-wrapper > .form > :nth-child(1) > .form__labels > .labels > :nth-child(4) > .form-control--responsive > .form-input--date').type('2026-06-01', { force: true });
       cy.get('.vacancy-add-form-wrapper > .form > :nth-child(1) > .form__labels > .labels > :nth-child(5) > .form-control--responsive > .form-input--date').type('2026-07-01', { force: true });
       cy.get('.vacancy-add-form-wrapper > .form > :nth-child(1) > .form__labels > .labels > :nth-child(6) > [name="requirements"] > .form-area').type('Знание Cypress', { force: true });
       cy.get('.vacancy-add-form-wrapper > .form > :nth-child(1) > .form__labels > .labels > :nth-child(7) > [name="responsibilities"] > .form-area').type('Писать тесты', { force: true });
       cy.get('.vacancy-add-form-wrapper > .form > .form__buttons > .buttons > .button').click({ force: true });
+      cy.get('[data-v-e4f6348f=""][data-v-4849dea2=""] > .vacancies-block > .infinite-loader > :nth-child(1)').should('be.visible').and('contain', 'Проверка12');
     });
-  }); 
+  });
 
   it('3. Просмотр страницы со стажировками (поиск и фильтр)', () => {
     cy.fixture('cypressTest').then((data) => {
@@ -35,6 +36,15 @@ describe('Cypress Tests', () => {
       cy.get(':nth-child(2) > .radio-component__label').click();
       cy.get('.form-select__selected').first().click();
       cy.get('.form-select__items > :nth-child(1)').click();
+
+      cy.request({
+        method: 'GET',
+        url: '**/api/internships',
+        qs: { search: 'Тестовая стажировка' }
+      }).then((response) => {
+        expect(response.status).to.eq(200);
+        expect(response.body).to.not.be.empty;
+      });
     });
   });
 
@@ -52,6 +62,11 @@ describe('Cypress Tests', () => {
         .first()
         .should('be.visible')
         .click({ force: true });
+
+      cy.get('.internship-item__footer-wrapper').first().within(() => {
+        cy.contains('Вы уже откликнулись!').should('be.visible');
+        cy.get('button').should('be.disabled');
+      });
     });
   });
 
@@ -60,30 +75,35 @@ describe('Cypress Tests', () => {
       cy.visit(data.main_url + '/login');
       cy.get('.form-input--text').type(data.login, { delay: 0 });
       cy.get('.form-input--password').type(data.password, { delay: 0 });
-      cy.get(':nth-child(3) > .button').click();  
+      cy.get(':nth-child(3) > .button').click();
       cy.get(':nth-child(5) > .menu-item__item-name').click();
       cy.get('.responses-page__tabs > .navigation-workspace > :nth-child(2) > .navigation-item__title').click();
       cy.get(':nth-child(2) > :nth-child(2) > .form-select__selected').click();
       cy.get('.form-select__items > :nth-child(4)').click();
       cy.get(':nth-child(1) > .responses-list-item__actions > :nth-child(1)').click({ force: true });
+      cy.get('.responses-list-item').first().should('contain', 'Рабочее пространство');
     });
   });
 
-  it('6. Взаимодействие внутри рабочего пространства', () => {
+it('6. Взаимодействие внутри рабочего пространства', () => {
     cy.fixture('cypressTest').then((data) => {
       cy.visit(data.main_url + '/login');
       cy.get('.form-input--text').type(data.login, { delay: 0 });
       cy.get('.form-input--password').type(data.password, { delay: 0 });
-      cy.get(':nth-child(3) > .button').click();
+      cy.get(':nth-child(3) > .button').click();   
       cy.get(':nth-child(5) > .menu-item__item-name').click();
       cy.get(':nth-child(3) > .navigation-item__title').click();
       cy.get(':nth-child(2) > :nth-child(2) > .form-select__selected').click();
       cy.get('.form-select__items > :nth-child(4)').click();
       cy.get('.infinite-loader > :nth-child(1) > .button').click();
-      cy.get('.form-area').type('Тестовый текст', { force: true });
+      cy.wait(2000); 
+
+      cy.get('.form-area').type('Тестовый текст52', { force: true });
       cy.get('.comment-textarea__buttons > :nth-child(2)').click();
+      cy.wait(2000); 
+      cy.get('body').should('contain', 'Тестовый текст52');
     });
-  });
+});
 
   it('7. Смена статуса рабочего пространства', () => {
     cy.fixture('cypressTest').then((data) => {
@@ -97,6 +117,8 @@ describe('Cypress Tests', () => {
       cy.get('.form-select__items > :nth-child(4)').click();
       cy.get('.infinite-loader > :nth-child(1) > .button').click();
       cy.get('.status-open__buttons > :nth-child(1)').click({ force: true });
+
+      cy.get('body').should('contain', 'Рабочее пространство заморожено');
     });
   });
 });
